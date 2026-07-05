@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="bn" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>shopping area bd</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .snap-x-mandatory { scroll-snap-type: x mandatory; }
+        .snap-center { scroll-snap-align: center; }
+        
+        /* View Transitions */
+        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Skeleton Loading */
+        .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        .dark .skeleton { background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%); background-size: 200% 100%; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 pb-16 md:pb-0 overflow-x-hidden">
+
+    <!-- Navbar (Top) -->
+    <nav class="bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-40 transition-colors duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl font-black text-indigo-600 cursor-pointer flex items-center gap-2" onclick="switchTab('home')">
+                <i class="fa-solid fa-bolt text-yellow-500"></i> SHOPPIN AREA
+            </h1>
+            
+            <!-- Desktop Search -->
+            <div class="hidden md:flex w-1/2 relative">
+                <input type="text" id="desktopSearch" placeholder="Search products, brands..." class="w-full pl-5 pr-10 py-2.5 border border-slate-200 rounded-l-xl dark:bg-slate-700 dark:border-slate-600 focus:outline-none focus:border-indigo-500 text-sm" autocomplete="off">
+                <button onclick="document.getElementById('imageSearchInput').click()" class="px-4 bg-slate-100 dark:bg-slate-700 border-t border-b border-slate-200 dark:border-slate-600 text-slate-500 hover:text-indigo-600 transition"><i class="fa-solid fa-camera"></i></button>
+                <button onclick="executeSearch(document.getElementById('desktopSearch').value)" class="bg-indigo-600 text-white px-5 py-2.5 rounded-r-xl hover:bg-indigo-700 transition"><i class="fa-solid fa-magnifying-glass"></i></button>
+                
+                <div id="desktopSearchDropdown" class="absolute top-full left-0 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-b-xl shadow-xl z-50 hidden max-h-60 overflow-y-auto"></div>
+            </div>
+
+            <div class="flex space-x-5 items-center">
+                <button id="themeToggle" class="text-xl text-slate-500 hover:text-indigo-600 transition-colors"><i class="fa-solid fa-moon"></i></button>
+                <div class="hidden md:flex space-x-4">
+                    <button class="text-xl relative text-slate-500 hover:text-indigo-600" onclick="switchTab('cart')">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span id="desktopCartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">0</span>
+                    </button>
+                    <button id="navLoginBtn" onclick="openLoginModal()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold text-sm hover:shadow-lg transition">Login</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Search -->
+        <div class="md:hidden px-4 pb-3 relative" id="mobileSearchContainer">
+            <div class="flex relative shadow-sm">
+                <input type="text" id="mobileSearch" placeholder="Search products..." class="w-full pl-5 pr-10 py-2.5 border border-slate-200 rounded-l-2xl dark:bg-slate-700 dark:border-slate-600 focus:outline-none focus:border-indigo-500 text-sm" autocomplete="off">
+                <button onclick="document.getElementById('imageSearchInput').click()" class="absolute right-[4rem] top-2.5 text-slate-400"><i class="fa-solid fa-camera"></i></button>
+                <button onclick="executeSearch(document.getElementById('mobileSearch').value)" class="bg-indigo-600 text-white px-5 py-2.5 rounded-r-2xl"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+            <div id="mobileSearchDropdown" class="absolute top-full left-4 right-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-b-2xl shadow-xl z-50 hidden max-h-60 overflow-y-auto"></div>
+        </div>
+    </nav>
+
+    <input type="file" accept="image/*" id="imageSearchInput" class="hidden">
+
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto min-h-[80vh]">
+        
+        <!-- ================= 1. HOME VIEW ================= -->
+        <section id="view-home" class="view-section active px-4 py-4 md:py-6">
+            
+            <div class="relative mb-8 group">
+                <div id="bannerSlider" class="flex overflow-x-auto hide-scroll snap-x-mandatory gap-4 rounded-2xl scroll-smooth">
+                    <div class="w-full h-44 md:h-72 rounded-2xl snap-center flex-shrink-0 skeleton"></div>
+                </div>
+                <div id="bannerDots" class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none"></div>
+            </div>
+
+            <h3 class="font-extrabold text-lg mb-4 text-slate-800 dark:text-white">Shop by Category</h3>
+            <div class="flex overflow-x-auto hide-scroll gap-6 mb-10 pb-2">
+                <div onclick="filterCategory('Gadgets')" class="flex flex-col items-center min-w-[70px] cursor-pointer group">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 rounded-full flex items-center justify-center text-2xl text-indigo-500 transition-colors shadow-sm"><i class="fa-solid fa-mobile-screen"></i></div>
+                    <span class="text-xs font-bold mt-2 text-slate-600 dark:text-slate-300">Gadgets</span>
+                </div>
+                <div onclick="filterCategory('Fashion')" class="flex flex-col items-center min-w-[70px] cursor-pointer group">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 rounded-full flex items-center justify-center text-2xl text-pink-500 transition-colors shadow-sm"><i class="fa-solid fa-shirt"></i></div>
+                    <span class="text-xs font-bold mt-2 text-slate-600 dark:text-slate-300">Fashion</span>
+                </div>
+                <div onclick="filterCategory('Laptops')" class="flex flex-col items-center min-w-[70px] cursor-pointer group">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 rounded-full flex items-center justify-center text-2xl text-blue-500 transition-colors shadow-sm"><i class="fa-solid fa-laptop"></i></div>
+                    <span class="text-xs font-bold mt-2 text-slate-600 dark:text-slate-300">Laptops</span>
+                </div>
+                <div onclick="filterCategory('Shoes')" class="flex flex-col items-center min-w-[70px] cursor-pointer group">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 rounded-full flex items-center justify-center text-2xl text-orange-500 transition-colors shadow-sm"><i class="fa-solid fa-shoe-prints"></i></div>
+                    <span class="text-xs font-bold mt-2 text-slate-600 dark:text-slate-300">Shoes</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black text-slate-800 dark:text-white">Just For You</h2>
+            </div>
+            
+            <div id="productGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                <div class="col-span-2 md:col-span-4 text-center py-10" id="loadingState">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl text-indigo-600"></i>
+                    <p class="mt-2 text-slate-500 font-medium">Discovering amazing products...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 2. SEARCH RESULTS VIEW ================= -->
+        <section id="view-search" class="view-section px-4 py-6">
+            <div class="flex items-center gap-3 mb-6">
+                <button onclick="switchTab('home')" class="text-slate-500 hover:text-indigo-600 text-xl"><i class="fa-solid fa-arrow-left"></i></button>
+                <h2 class="text-xl font-bold text-slate-800 dark:text-white">Search Results <span id="searchKeyword" class="text-indigo-600 font-normal text-lg"></span></h2>
+            </div>
+            <div id="searchResultsGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
+        </section>
+
+        <!-- ================= 3. PRODUCT DETAILS VIEW ================= -->
+        <section id="view-details" class="view-section px-4 py-6 md:py-8 max-w-5xl mx-auto">
+            <button onclick="switchTab('home')" class="mb-6 text-slate-500 hover:text-indigo-600 font-bold"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Shop</button>
+            <div id="detailsContainer" class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+                <!-- Details injected here -->
+            </div>
+        </section>
+
+        <!-- ================= 4. CART & CHECKOUT ================= -->
+        <section id="view-cart" class="view-section px-4 py-6 md:py-8 max-w-5xl mx-auto">
+            <h2 class="text-3xl font-black mb-8 text-slate-800 dark:text-white">My Cart</h2>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="flex-1" id="cartItemsContainer"></div>
+                <div class="w-full lg:w-96 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 h-fit">
+                    <h3 class="font-black text-xl mb-6 border-b dark:border-slate-700 pb-3">Order Summary</h3>
+                    <div class="flex justify-between mb-3 text-sm font-medium text-slate-600 dark:text-slate-300"><span>Subtotal:</span> <span id="cartSubtotal" class="font-bold text-slate-800 dark:text-white">৳0</span></div>
+                    <div class="flex justify-between mb-6 text-sm text-slate-500"><span>Delivery Charge:</span> <span>Will calculate at checkout</span></div>
+                    <div class="flex justify-between mb-8 font-black text-2xl border-t dark:border-slate-700 pt-4"><span>Total:</span> <span id="cartTotal" class="text-indigo-600">৳0</span></div>
+                    <button onclick="proceedToCheckout()" class="w-full bg-indigo-600 text-white py-3.5 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/30 transition text-lg">Proceed to Checkout</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-checkout" class="view-section px-4 py-6 md:py-8 max-w-2xl mx-auto">
+            <h2 class="text-3xl font-black mb-8 flex items-center gap-3"><button onclick="switchTab('cart')" class="text-slate-400 hover:text-indigo-600 text-2xl"><i class="fa-solid fa-arrow-left"></i></button> Secure Checkout</h2>
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 mb-6">
+                
+                <!-- Updated Delivery Info Layout -->
+                <h3 class="font-black text-lg mb-5 text-slate-800 dark:text-white border-b dark:border-slate-700 pb-2">Delivery Information</h3>
+                <input type="text" id="chkName" placeholder="Full Name" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
+                <input type="tel" id="chkPhone" placeholder="Phone Number" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <select id="chkDivision" class="w-full p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-slate-600 dark:text-slate-300" required>
+                        <option value="" disabled selected>Select Division</option>
+                        <option value="Dhaka">Dhaka</option>
+                        <option value="Chattogram">Chattogram</option>
+                        <option value="Rajshahi">Rajshahi</option>
+                        <option value="Khulna">Khulna</option>
+                        <option value="Barishal">Barishal</option>
+                        <option value="Sylhet">Sylhet</option>
+                        <option value="Rangpur">Rangpur</option>
+                        <option value="Mymensingh">Mymensingh</option>
+                    </select>
+                    <input type="text" id="chkDistrict" placeholder="District" class="w-full p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
+                    <input type="text" id="chkThana" placeholder="Thana / Upazila" class="w-full p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
+                    <input type="text" id="chkArea" placeholder="Union / Area" class="w-full p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
+                </div>
+                
+                <textarea id="chkAddressDetails" placeholder="Detailed Address (House, Road, Village)" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" rows="2" required></textarea>
+                
+                <!-- Updated Payment Details -->
+                <h3 class="font-black text-lg mt-6 mb-3 text-slate-800 dark:text-white border-b dark:border-slate-700 pb-2">Advance Delivery Charge</h3>
+                <p class="text-sm text-slate-500 mb-4 font-medium leading-relaxed">
+                    To confirm your order, please pay the delivery charge (<span id="checkoutDcAmount" class="font-bold text-indigo-600">৳0</span>) to <strong id="adminBkash" class="text-pink-600 bg-pink-50 px-2 py-0.5 rounded">Loading...</strong> via bKash/Nagad. The rest amount will be collected on delivery (Cash on Delivery).
+                </p>
+                
+                <input type="text" id="chkTrx" placeholder="Enter bKash/Nagad TrxID" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-bold font-mono tracking-wide" required>
+                
+                <button onclick="placeOrder(event)" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-lg hover:bg-emerald-600 mt-6 shadow-lg hover:shadow-emerald-500/30 transition">Confirm Order</button>
+            </div>
+        </section>
+
+        <!-- ================= 5. ME / PROFILE / ORDERS VIEW ================= -->
+        <section id="view-me" class="view-section px-4 py-6 md:py-8 max-w-3xl mx-auto relative">
+            
+            <div class="flex justify-between items-center mb-6 px-1">
+                <h2 class="text-2xl font-black text-slate-800 dark:text-white">My Profile</h2>
+                <!-- Hamburger Menu Button -->
+                <button id="meMenuBtn" onclick="openSettingsMenu()" class="text-2xl text-slate-500 hover:text-indigo-600 transition hidden"><i class="fa-solid fa-bars"></i></button>
+            </div>
+
+            <div id="profileContainer" class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 text-center mb-6 relative overflow-hidden">
+                <!-- Injected via Auth -->
+            </div>
+
+            <div id="meFeatures" class="hidden">
+                <h3 class="font-black text-lg mb-4 text-slate-800 dark:text-white">My Order Status</h3>
+                
+                <div class="grid grid-cols-4 gap-3 mb-6 bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50">
+                    <div class="flex flex-col items-center cursor-pointer hover:scale-105 transition" onclick="switchTab('orders')">
+                        <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-lg mb-2 relative">
+                            <i class="fa-solid fa-clock"></i>
+                            <span id="badgePending" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                        </div>
+                        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Pending</span>
+                    </div>
+                    <div class="flex flex-col items-center cursor-pointer hover:scale-105 transition" onclick="switchTab('orders')">
+                        <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-full flex items-center justify-center text-lg mb-2 relative">
+                            <i class="fa-solid fa-box"></i>
+                            <span id="badgeProcessing" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                        </div>
+                        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Processing</span>
+                    </div>
+                    <div class="flex flex-col items-center cursor-pointer hover:scale-105 transition" onclick="switchTab('orders')">
+                        <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 rounded-full flex items-center justify-center text-lg mb-2 relative">
+                            <i class="fa-solid fa-truck-fast"></i>
+                            <span id="badgeShipping" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                        </div>
+                        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Shipping</span>
+                    </div>
+                    <div class="flex flex-col items-center cursor-pointer hover:scale-105 transition" onclick="switchTab('orders')">
+                        <div class="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-full flex items-center justify-center text-lg mb-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Delivered</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Orders History -->
+        <section id="view-orders" class="view-section px-4 py-6 md:py-8 max-w-4xl mx-auto">
+            <div class="flex items-center gap-3 mb-8">
+                <button onclick="switchTab('me')" class="text-slate-500 hover:text-indigo-600 text-xl"><i class="fa-solid fa-arrow-left"></i></button>
+                <h2 class="text-2xl font-black text-slate-800 dark:text-white">My Order History</h2>
+            </div>
+            <div id="ordersListContainer" class="space-y-4">
+                <div class="text-center py-10"><i class="fa-solid fa-spinner fa-spin text-indigo-500 text-2xl"></i></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation (Mobile Only) -->
+    <nav class="md:hidden fixed bottom-0 w-full bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 flex justify-around items-center h-16 z-40 pb-safe shadow-[0_-5px_15px_rgba(0,0,0,0.05)] transition-colors duration-300">
+        <button onclick="switchTab('home')" class="nav-btn flex flex-col items-center w-1/4 text-indigo-600 transition-colors" data-tab="home">
+            <i class="fa-solid fa-house text-xl mb-1 transition-transform"></i>
+            <span class="text-[10px] font-bold">Home</span>
+        </button>
+        <button onclick="switchTab('cart')" class="nav-btn flex flex-col items-center w-1/4 text-slate-400 hover:text-indigo-500 transition-colors" data-tab="cart">
+            <div class="relative">
+                <i class="fa-solid fa-cart-shopping text-xl mb-1 transition-transform"></i>
+                <span id="mobileCartCount" class="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">0</span>
+            </div>
+            <span class="text-[10px] font-bold">Cart</span>
+        </button>
+        <button onclick="openWhatsApp()" class="nav-btn flex flex-col items-center w-1/4 text-slate-400 hover:text-indigo-500 transition-colors relative" data-tab="chat">
+            <i class="fa-brands fa-whatsapp text-xl mb-1 transition-transform"></i>
+            <span class="text-[10px] font-bold">Chat</span>
+        </button>
+        <button onclick="switchTab('me')" class="nav-btn flex flex-col items-center w-1/4 text-slate-400 hover:text-indigo-500 transition-colors" data-tab="me">
+            <i class="fa-solid fa-user text-xl mb-1 transition-transform"></i>
+            <span class="text-[10px] font-bold">Me</span>
+        </button>
+    </nav>
+
+    <!-- Settings Menu Drawer (Hamburger Menu Content) -->
+    <div id="settingsMenuOverlay" class="fixed inset-0 bg-slate-900/60 z-[60] hidden backdrop-blur-sm transition-opacity opacity-0" onclick="closeSettingsMenu()"></div>
+    <div id="settingsMenu" class="fixed top-0 right-0 h-full w-3/4 max-w-sm bg-white dark:bg-slate-800 z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <div class="p-6 border-b dark:border-slate-100 dark:border-slate-700/50 flex justify-between items-center">
+            <h3 class="font-black text-xl text-slate-800 dark:text-white">Settings</h3>
+            <button onclick="closeSettingsMenu()" class="text-slate-400 hover:text-red-500 text-2xl transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="p-6 space-y-4 flex-1 overflow-y-auto">
+            <button onclick="closeSettingsAndSwitch('orders')" class="w-full bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 p-4 rounded-2xl flex justify-between items-center transition border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3"><i class="fa-solid fa-list-check w-6 text-indigo-500"></i> Order History</span> 
+                <i class="fa-solid fa-chevron-right text-sm text-slate-400"></i>
+            </button>
+            <button onclick="closeSettingsMenu(); openChangePasswordModal()" class="w-full bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 p-4 rounded-2xl flex justify-between items-center transition border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3"><i class="fa-solid fa-key w-6 text-amber-500"></i> Change Password</span> 
+                <i class="fa-solid fa-chevron-right text-sm text-slate-400"></i>
+            </button>
+            <button onclick="closeSettingsMenu(); openWhatsApp()" class="w-full bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 p-4 rounded-2xl flex justify-between items-center transition border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3"><i class="fa-brands fa-whatsapp w-6 text-emerald-500"></i> Help & Support</span> 
+                <i class="fa-solid fa-chevron-right text-sm text-slate-400"></i>
+            </button>
+        </div>
+        <div class="p-6 border-t dark:border-slate-100 dark:border-slate-700/50">
+            <button onclick="closeSettingsMenu(); logout()" class="w-full bg-red-50 dark:bg-red-900/20 text-red-600 p-4 rounded-2xl font-black border border-red-100 dark:border-red-900/50 hover:bg-red-100 transition shadow-sm flex justify-center items-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Log Out Safely
+            </button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="authModal" class="fixed inset-0 bg-slate-900/60 z-[80] hidden flex items-center justify-center px-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm p-8 rounded-3xl shadow-2xl relative transition-all transform scale-95 opacity-0 duration-300" id="authModalContent">
+            <button onclick="closeLoginModal()" class="absolute top-5 right-5 text-slate-400 hover:text-red-500 bg-slate-100 dark:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div id="loginFormBlock">
+                <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-user-lock"></i></div>
+                <h2 class="text-2xl font-black mb-6 text-center text-slate-800 dark:text-white">Welcome Back</h2>
+                <input type="email" id="logEmail" placeholder="Email Address" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-sm">
+                <input type="password" id="logPass" placeholder="Password" class="w-full mb-2 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-sm">
+                <div class="text-right mb-6"><button class="text-xs font-bold text-indigo-500 hover:underline">Forgot Password?</button></div>
+                <button onclick="handleLogin()" id="logBtn" class="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30">Secure Login</button>
+                <p class="text-center mt-6 text-sm text-slate-500 font-medium">New to eShop? <button onclick="toggleAuth('register')" class="text-indigo-600 font-bold hover:underline">Create Account</button></p>
+            </div>
+
+            <div id="registerFormBlock" class="hidden">
+                <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-user-plus"></i></div>
+                <h2 class="text-2xl font-black mb-6 text-center text-slate-800 dark:text-white">Create Account</h2>
+                <input type="text" id="regName" placeholder="Full Name" class="w-full mb-3 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-sm">
+                <input type="email" id="regEmail" placeholder="Email Address" class="w-full mb-3 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-sm">
+                <input type="password" id="regPass" placeholder="Password" class="w-full mb-6 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-sm">
+                <button onclick="handleRegister()" id="regBtn" class="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30">Sign Up Free</button>
+                <p class="text-center mt-6 text-sm text-slate-500 font-medium">Already registered? <button onclick="toggleAuth('login')" class="text-indigo-600 font-bold hover:underline">Login here</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="passwordModal" class="fixed inset-0 bg-slate-900/60 z-[80] hidden flex items-center justify-center px-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm p-8 rounded-3xl shadow-2xl relative transition-all transform scale-95 opacity-0 duration-300" id="passwordModalContent">
+            <button onclick="closeChangePasswordModal()" class="absolute top-5 right-5 text-slate-400 hover:text-red-500 bg-slate-100 dark:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-key"></i></div>
+            <h2 class="text-2xl font-black mb-6 text-center text-slate-800 dark:text-white">Change Password</h2>
+            <input type="password" id="pwdOld" placeholder="Current Password" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-sm">
+            <input type="password" id="pwdNew" placeholder="New Password" class="w-full mb-6 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-sm">
+            <button onclick="updateUserPassword()" id="pwdBtn" class="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30">Update Password</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 right-4 bg-slate-900/95 backdrop-blur text-white px-5 py-3 rounded-xl shadow-2xl transform translate-x-full transition-all duration-300 z-[100] flex items-center gap-3 font-medium text-sm border border-slate-700">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="toastMsg">Message</span>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center text-white">
+        <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <h3 class="text-xl font-bold animate-pulse">Analyzing Image...</h3>
+        <p class="text-sm text-slate-300 mt-2">Finding matching products</p>
+    </div>
+
+    <!-- Firebase SDK & Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, where, getDoc, doc, addDoc, updateDoc, setDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1tUj2W61ogTBWmIGCcLfxEPpC9bTzklA",
+            authDomain: "shopping-60522.firebaseapp.com",
+            projectId: "shopping-60522",
+            storageBucket: "shopping-60522.firebasestorage.app",
+            messagingSenderId: "760708854745",
+            appId: "1:760708854745:web:288f3cad7a560cc7489fc8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const WHATSAPP_NUMBER = "8801347062830";
+
+        // State Variables
+        window.allProducts = [];
+        window.cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        window.currentUser = null;
+        window.adminSettings = { bkash: "01XXXXXXXXX", deliveryCharge: 120 };
+        window.directBuyItem = null;
+
+        // ================= THEME TOGGLE =================
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+            htmlElement.classList.remove('light');
+            themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        } else {
+            themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+            } else {
+                htmlElement.classList.add('dark');
+                htmlElement.classList.remove('light');
+                localStorage.setItem('theme', 'dark');
+                themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            }
+        });
+
+        // UI Helpers
+        window.showToast = (msg, type='info') => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => toast.classList.add('translate-x-full'), 3000);
+        }
+
+        window.openWhatsApp = () => window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
+
+        window.switchTab = (tabId) => {
+            if(tabId !== 'checkout') window.directBuyItem = null; 
+
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${tabId}`).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-600');
+                btn.classList.add('text-slate-400');
+                if(btn.dataset.tab === tabId) {
+                    btn.classList.remove('text-slate-400');
+                    btn.classList.add('text-indigo-600');
+                    btn.querySelector('i').classList.add('scale-110');
+                } else {
+                    btn.querySelector('i')?.classList.remove('scale-110');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            if(tabId === 'cart') renderCart();
+            if(tabId === 'me' && !currentUser) openLoginModal();
+            if(tabId === 'orders') fetchMyOrders();
+        }
+
+        // ================= SETTINGS MENU (Hamburger) =================
+        window.openSettingsMenu = () => {
+            const over = document.getElementById('settingsMenuOverlay'), menu = document.getElementById('settingsMenu');
+            over.classList.remove('hidden');
+            setTimeout(() => over.classList.remove('opacity-0'), 10);
+            menu.classList.remove('translate-x-full');
+        };
+        window.closeSettingsMenu = () => {
+            const over = document.getElementById('settingsMenuOverlay'), menu = document.getElementById('settingsMenu');
+            over.classList.add('opacity-0');
+            menu.classList.add('translate-x-full');
+            setTimeout(() => over.classList.add('hidden'), 300);
+        };
+        window.closeSettingsAndSwitch = (tab) => {
+            closeSettingsMenu();
+            switchTab(tab);
+        };
+
+        // Auth Methods
+        window.openLoginModal = () => { document.getElementById('authModal').classList.remove('hidden'); setTimeout(() => document.getElementById('authModalContent').classList.remove('scale-95', 'opacity-0'), 10); }
+        window.closeLoginModal = () => { document.getElementById('authModalContent').classList.add('scale-95', 'opacity-0'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }
+        window.toggleAuth = (t) => { document.getElementById('loginFormBlock').style.display = t === 'login' ? 'block' : 'none'; document.getElementById('registerFormBlock').style.display = t === 'register' ? 'block' : 'none'; }
+        window.requireAuth = (cb) => { if(currentUser) cb(); else { showToast("Login Required!"); openLoginModal(); } }
+
+        window.handleLogin = async () => {
+            const e = document.getElementById('logEmail').value, p = document.getElementById('logPass').value;
+            const b = document.getElementById('logBtn'); b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+            try { await signInWithEmailAndPassword(auth, e, p); closeLoginModal(); showToast("Logged In!"); } catch(err) { showToast(err.message, 'error'); }
+            b.innerHTML = 'Secure Login';
+        }
+        window.handleRegister = async () => {
+            const n = document.getElementById('regName').value, e = document.getElementById('regEmail').value, p = document.getElementById('regPass').value;
+            try { const cred = await createUserWithEmailAndPassword(auth, e, p); await updateProfile(cred.user, { displayName: n }); closeLoginModal(); showToast("Account Created!"); } catch(err) { showToast(err.message, 'error'); }
+        }
+        window.logout = async () => { await signOut(auth); switchTab('home'); showToast("Logged Out"); }
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if(user) {
+                document.getElementById('navLoginBtn').innerText = 'Profile'; document.getElementById('navLoginBtn').onclick = () => switchTab('me');
+                document.getElementById('profileContainer').innerHTML = `<div class="w-24 h-24 bg-white dark:bg-slate-800 text-indigo-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border-4 border-slate-50 dark:border-slate-700 relative z-10"><i class="fa-solid fa-user"></i></div><h2 class="text-2xl font-black text-slate-800 dark:text-white relative z-10">${user.displayName || 'Customer'}</h2><p class="text-slate-500 text-sm font-medium relative z-10">${user.email}</p>`;
+                
+                document.getElementById('meMenuBtn').classList.remove('hidden');
+                document.getElementById('meFeatures').classList.remove('hidden');
+                
+                onSnapshot(query(collection(db, "orders"), where("userId", "==", user.uid)), snap => {
+                    let p=0, sh=0; snap.forEach(d => { const st = d.data().status; if(st === 'Pending' || st === 'Confirmed') p++; if(st === 'Shipping') sh++; });
+                    const bp = document.getElementById('badgePending'); const bs = document.getElementById('badgeShipping');
+                    if(p > 0) { bp.innerText = p; bp.classList.remove('hidden'); } else bp.classList.add('hidden');
+                    if(sh > 0) { bs.innerText = sh; bs.classList.remove('hidden'); } else bs.classList.add('hidden');
+                });
+            } else {
+                document.getElementById('navLoginBtn').innerText = 'Login'; document.getElementById('navLoginBtn').onclick = openLoginModal;
+                document.getElementById('profileContainer').innerHTML = `<i class="fa-solid fa-user-shield text-6xl text-slate-300 mb-4"></i><h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Guest User</h2><p class="mb-6 text-sm text-slate-500 font-medium">Login to view your profile and orders</p><button onclick="openLoginModal()" class="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-indigo-500/30">Login / Register</button>`;
+                
+                document.getElementById('meMenuBtn').classList.add('hidden');
+                document.getElementById('meFeatures').classList.add('hidden');
+            }
+        });
+
+        // ================= PASSWORD CHANGE =================
+        window.openChangePasswordModal = () => { document.getElementById('pwdOld').value = ''; document.getElementById('pwdNew').value = ''; document.getElementById('passwordModal').classList.remove('hidden'); setTimeout(() => document.getElementById('passwordModalContent').classList.remove('scale-95', 'opacity-0'), 10); };
+        window.closeChangePasswordModal = () => { document.getElementById('passwordModalContent').classList.add('scale-95', 'opacity-0'); setTimeout(() => document.getElementById('passwordModal').classList.add('hidden'), 300); };
+        window.updateUserPassword = async () => {
+            if(!currentUser) return;
+            const oldP = document.getElementById('pwdOld').value, newP = document.getElementById('pwdNew').value;
+            if(!oldP || !newP) return showToast('Please fill both fields', 'error');
+            const btn = document.getElementById('pwdBtn'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
+            try { await reauthenticateWithCredential(currentUser, EmailAuthProvider.credential(currentUser.email, oldP)); await updatePassword(currentUser, newP); closeChangePasswordModal(); showToast('Password Updated Successfully!'); } catch(e) { showToast(e.message, 'error'); }
+            btn.innerHTML = 'Update Password';
+        };
+
+        // ================= DATA FETCH =================
+        getDoc(doc(db, "settings", "admin")).then(d => { if(d.exists()){ window.adminSettings = d.data(); document.getElementById('adminBkash').innerText = window.adminSettings.bkash || "01XXXXXXXXX"; }});
+
+        onSnapshot(query(collection(db, "banners"), where("active", "==", true)), snap => {
+            const s = document.getElementById('bannerSlider'), dots = document.getElementById('bannerDots');
+            if(snap.empty) { s.innerHTML = '<div class="w-full h-44 md:h-72 bg-indigo-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center font-bold text-indigo-400">Welcome to eShop</div>'; dots.innerHTML = ''; return; }
+            s.innerHTML = snap.docs.map(doc => `<img src="${doc.data().image}" onclick="window.open('${doc.data().link||'#'}', '_blank')" class="w-full h-44 md:h-72 object-contain bg-slate-100 dark:bg-slate-900 rounded-2xl snap-center flex-shrink-0 cursor-pointer shadow-sm">`).join('');
+            dots.innerHTML = snap.docs.map((_, i) => `<div class="banner-dot w-2 h-2 rounded-full transition-all duration-300 ${i === 0 ? 'bg-indigo-600 w-5' : 'bg-slate-300 dark:bg-slate-600 opacity-70'}"></div>`).join('');
+            setupBannerSlider(snap.docs.length);
+        });
+
+        window.setupBannerSlider = (count) => {
+            const slider = document.getElementById('bannerSlider'); const dots = document.getElementById('bannerDots').children;
+            if(count <= 1) return;
+            let currentIndex = 0;
+            slider.addEventListener('scroll', () => {
+                const index = Math.round(slider.scrollLeft / slider.offsetWidth);
+                if(index >= 0 && index < count && currentIndex !== index) {
+                    currentIndex = index;
+                    for(let i=0; i<dots.length; i++) dots[i].className = i===index ? 'banner-dot w-5 h-2 rounded-full transition-all duration-300 bg-indigo-600 shadow-sm' : 'banner-dot w-2 h-2 rounded-full transition-all duration-300 bg-slate-300 dark:bg-slate-600 opacity-70';
+                }
+            });
+            if(window.bannerInterval) clearInterval(window.bannerInterval);
+            window.bannerInterval = setInterval(() => { currentIndex = (currentIndex + 1) % count; const child = slider.children[currentIndex]; if(child) slider.scrollTo({ left: child.offsetLeft - slider.offsetLeft, behavior: 'smooth' }); }, 3500);
+        };
+
+        onSnapshot(query(collection(db, "products"), where("status", "==", "show")), snap => {
+            window.allProducts = []; document.getElementById('productGrid').innerHTML = '';
+            snap.forEach(doc => { const d = doc.data(); d.id = doc.id; window.allProducts.push(d); renderProductCard(d, 'productGrid'); });
+        });
+
+        const renderProductCard = (product, containerId) => {
+            const hasOffer = product.offerPrice && product.offerPrice < product.price;
+            const card = `
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden product-card relative cursor-pointer flex flex-col h-full" onclick="openDetails('${product.id}')">
+                    ${hasOffer ? `<span class="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full z-10 shadow-sm">-${Math.round(((product.price-product.offerPrice)/product.price)*100)}%</span>` : ''}
+                    <div class="relative overflow-hidden aspect-[4/5] bg-slate-100 dark:bg-slate-900">
+                        <img src="${product.images[0]}" class="w-full h-full object-cover product-img transition-transform duration-500">
+                        ${product.stock <= 0 ? '<div class="absolute inset-0 bg-white/70 dark:bg-slate-900/70 flex items-center justify-center font-black text-red-600 backdrop-blur-sm z-10">Out of Stock</div>' : ''}
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-2">${product.name}</h3>
+                        <div class="mt-2 flex items-center gap-2">
+                            <span class="text-indigo-600 font-black text-base">৳${hasOffer ? product.offerPrice : product.price}</span>
+                            ${hasOffer ? `<span class="text-xs text-slate-400 line-through font-medium">৳${product.price}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById(containerId).insertAdjacentHTML('beforeend', card);
+        };
+
+        // ================= SEARCH =================
+        const setupAutocomplete = (inputId, dropId) => {
+            const inp = document.getElementById(inputId), drop = document.getElementById(dropId);
+            inp.addEventListener('input', e => {
+                const term = e.target.value.toLowerCase().trim();
+                if(!term) { drop.classList.add('hidden'); return; }
+                const matches = window.allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category||'').toLowerCase().includes(term)).slice(0,5);
+                if(matches.length > 0) {
+                    drop.innerHTML = matches.map(m => `<div onclick="openDetails('${m.id}')" class="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b dark:border-slate-700 last:border-0"><img src="${m.images[0]}" class="w-10 h-10 rounded-lg object-cover"><div><p class="font-bold text-sm text-slate-800 dark:text-white">${m.name}</p><p class="text-xs text-indigo-600 font-bold">৳${m.offerPrice || m.price}</p></div></div>`).join('') + `<div onclick="executeSearch('${term}')" class="p-3 text-center text-sm font-bold text-indigo-600 cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20">View all results</div>`;
+                    drop.classList.remove('hidden');
+                } else drop.classList.add('hidden');
+            });
+            document.addEventListener('click', (e) => { if(!inp.contains(e.target) && !drop.contains(e.target)) drop.classList.add('hidden'); });
+        }
+        setupAutocomplete('desktopSearch', 'desktopSearchDropdown'); setupAutocomplete('mobileSearch', 'mobileSearchDropdown');
+
+        window.executeSearch = (term) => {
+            if(!term) return;
+            document.getElementById('desktopSearchDropdown').classList.add('hidden'); document.getElementById('mobileSearchDropdown').classList.add('hidden');
+            document.getElementById('searchKeyword').innerText = `for "${term}"`;
+            const container = document.getElementById('searchResultsGrid'); container.innerHTML = '';
+            const res = window.allProducts.filter(p => p.name.toLowerCase().includes(term.toLowerCase()) || (p.category||'').toLowerCase().includes(term.toLowerCase()));
+            if(res.length > 0) res.forEach(p => renderProductCard(p, 'searchResultsGrid')); else container.innerHTML = '<div class="col-span-2 md:col-span-4 py-20 text-center font-bold text-slate-500">No products found. Try a different keyword.</div>';
+            switchTab('search');
+        };
+
+        window.filterCategory = (cat) => {
+            document.getElementById('searchKeyword').innerText = `in ${cat}`;
+            const container = document.getElementById('searchResultsGrid'); container.innerHTML = '';
+            const res = window.allProducts.filter(p => (p.category||'').toLowerCase() === cat.toLowerCase());
+            if(res.length > 0) res.forEach(p => renderProductCard(p, 'searchResultsGrid')); else container.innerHTML = `<div class="col-span-2 md:col-span-4 py-20 text-center font-bold text-slate-500">No products in ${cat} yet.</div>`;
+            switchTab('search');
+        };
+
+        // ================= PRODUCT DETAILS =================
+        window.openDetails = (id) => {
+            const product = window.allProducts.find(p => p.id === id);
+            if(!product) return;
+            const hasOffer = product.offerPrice && product.offerPrice < product.price;
+            const currentPrice = hasOffer ? product.offerPrice : product.price;
+
+            let sliderHtml = product.images.map(img => `<img src="${img}" class="w-full h-72 md:h-96 object-contain snap-center flex-shrink-0 bg-slate-50 dark:bg-slate-900/50">`).join('');
+
+            const html = `
+                <div class="flex flex-col md:flex-row p-6 gap-8">
+                    <div class="w-full md:w-1/2 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 relative">
+                        <div class="flex overflow-x-auto hide-scroll snap-x-mandatory h-full">${sliderHtml}</div>
+                        <div class="absolute bottom-2 w-full text-center text-[10px] font-bold text-slate-400 bg-black/10 backdrop-blur-sm py-1">SWIPE</div>
+                    </div>
+                    <div class="w-full md:w-1/2 flex flex-col justify-center">
+                        <div class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 text-xs font-black px-3 py-1 rounded-full w-fit mb-4 uppercase tracking-wide">${product.category || 'General'}</div>
+                        <h2 class="text-3xl font-black mb-3 text-slate-800 dark:text-white leading-tight">${product.name}</h2>
+                        
+                        <div class="flex items-center gap-4 mb-6 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/50 w-fit">
+                            <span class="text-4xl text-indigo-600 font-black">৳${currentPrice}</span>
+                            ${hasOffer ? `<div class="flex flex-col"><span class="text-sm text-slate-400 line-through font-bold">৳${product.price}</span><span class="text-xs text-red-500 font-black">Save ৳${product.price - product.offerPrice}</span></div>` : ''}
+                        </div>
+                        
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-8 leading-relaxed font-medium">${product.description || 'No detailed description provided.'}</p>
+                        
+                        <div class="flex gap-4 mb-4">
+                            <button onclick="addToCart('${product.id}', true)" class="flex-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 py-4 rounded-2xl font-black transition shadow-sm" ${product.stock<=0?'disabled':''}>Add to Cart</button>
+                            <button onclick="requireAuth(() => buyNow('${product.id}'))" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 transition" ${product.stock<=0?'disabled':''}>Buy Now</button>
+                        </div>
+                        
+                        <button onclick="askAboutProduct('${product.id}')" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-600 transition border border-slate-200 dark:border-slate-600">
+                            <i class="fa-brands fa-whatsapp text-emerald-500 text-lg"></i> Ask Admin about this product
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detailsContainer').innerHTML = html;
+            switchTab('details');
+        }
+
+        window.askAboutProduct = (productId) => {
+            const product = window.allProducts.find(p => p.id === productId);
+            if(!product) return;
+            const message = `${product.name}\n${window.location.origin}${window.location.pathname}?product=${productId}\n\nআমি এই প্রোডাক্ট সম্পর্কে কিছু জানতে চাই`;
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        // ================= CART & CHECKOUT =================
+        const updateCartCount = () => {
+            const count = window.cart.length; 
+            document.getElementById('desktopCartCount').innerText = count;
+            document.getElementById('mobileCartCount').innerText = count;
+        }
+        updateCartCount();
+
+        window.addToCart = (id, fromDetails=false) => {
+            requireAuth(() => {
+                const product = window.allProducts.find(p => p.id === id);
+                const existing = window.cart.find(c => c.id === id);
+                if(existing) existing.qty += 1;
+                else window.cart.push({ id: product.id, name: product.name, image: product.images[0], price: product.offerPrice || product.price, qty: 1, checked: true });
+                localStorage.setItem('cart', JSON.stringify(window.cart));
+                updateCartCount(); showToast('Added to Cart');
+                if(!fromDetails) switchTab('cart');
+            });
+        }
+
+        const setCheckoutDcAmount = () => {
+            const el = document.getElementById('checkoutDcAmount');
+            if(el) el.innerText = `৳${window.adminSettings.deliveryCharge || 120}`;
+        };
+
+        window.buyNow = (id) => { 
+            const product = window.allProducts.find(p => p.id === id);
+            window.directBuyItem = { 
+                id: product.id, name: product.name, image: product.images[0], 
+                price: product.offerPrice || product.price, qty: 1, checked: true 
+            };
+            setCheckoutDcAmount();
+            switchTab('checkout'); 
+        }
+
+        window.renderCart = () => {
+            const container = document.getElementById('cartItemsContainer');
+            if(window.cart.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 text-slate-400"><i class="fa-solid fa-bag-shopping text-6xl mb-4 text-slate-200 dark:text-slate-700"></i><br><p class="font-bold">Your cart is empty</p></div>';
+                document.getElementById('cartSubtotal').innerText = '৳0'; document.getElementById('cartTotal').innerText = '৳0'; return;
+            }
+            let html = '', sub = 0, checked = 0;
+            window.cart.forEach((item, index) => {
+                if(item.checked) { sub += (item.price * item.qty); checked++; }
+                html += `
+                    <div class="flex items-center gap-4 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm mb-4 border border-slate-100 dark:border-slate-700/50">
+                        <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleCartCheck(${index})" class="w-5 h-5 accent-indigo-600 cursor-pointer">
+                        <img src="${item.image}" class="w-20 h-20 object-cover rounded-xl border border-slate-100 dark:border-slate-700">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold truncate text-slate-800 dark:text-white">${item.name}</h4>
+                            <p class="text-indigo-600 font-black mt-1">৳${item.price}</p>
+                        </div>
+                        <div class="flex flex-col md:flex-row items-end md:items-center gap-3">
+                            <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-900 rounded-lg p-1 border border-slate-100 dark:border-slate-700">
+                                <button onclick="changeQty(${index}, -1)" class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-indigo-600 bg-white dark:bg-slate-800 rounded shadow-sm"><i class="fa-solid fa-minus text-xs"></i></button>
+                                <span class="text-sm font-black w-4 text-center">${item.qty}</span>
+                                <button onclick="changeQty(${index}, 1)" class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-indigo-600 bg-white dark:bg-slate-800 rounded shadow-sm"><i class="fa-solid fa-plus text-xs"></i></button>
+                            </div>
+                            <button onclick="removeCart(${index})" class="text-red-500 p-2.5 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 rounded-lg transition"><i class="fa-solid fa-trash text-sm"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            document.getElementById('cartSubtotal').innerText = `৳${sub}`;
+            document.getElementById('cartTotal').innerText = `৳${sub + (checked>0 ? window.adminSettings.deliveryCharge : 0)}`;
+        }
+
+        window.toggleCartCheck = (i) => { window.cart[i].checked = !window.cart[i].checked; localStorage.setItem('cart', JSON.stringify(window.cart)); renderCart(); }
+        window.changeQty = (i, d) => { window.cart[i].qty += d; if(window.cart[i].qty<=0) window.cart[i].qty=1; localStorage.setItem('cart', JSON.stringify(window.cart)); updateCartCount(); renderCart(); }
+        window.removeCart = (i) => { window.cart.splice(i, 1); localStorage.setItem('cart', JSON.stringify(window.cart)); updateCartCount(); renderCart(); }
+
+        window.proceedToCheckout = () => { 
+            window.directBuyItem = null; 
+            if(window.cart.some(c=>c.checked)) {
+                setCheckoutDcAmount();
+                requireAuth(()=>switchTab('checkout')); 
+            }
+            else showToast("Select items to checkout", "error"); 
+        }
+
+        window.placeOrder = async (e) => {
+            const n = document.getElementById('chkName').value;
+            const p = document.getElementById('chkPhone').value;
+            const div = document.getElementById('chkDivision').value;
+            const dist = document.getElementById('chkDistrict').value;
+            const tha = document.getElementById('chkThana').value;
+            const area = document.getElementById('chkArea').value;
+            const adrDetails = document.getElementById('chkAddressDetails').value;
+            const trx = document.getElementById('chkTrx').value;
+            
+            if(!n || !p || !div || !dist || !tha || !area || !adrDetails) return showToast("Please fill all delivery details", "error");
+            if(!trx) return showToast("TrxID is required to confirm order", "error");
+
+            const fullAddress = `${adrDetails}, ${area}, ${tha}, ${dist}, ${div}`;
+            const items = window.directBuyItem ? [window.directBuyItem] : window.cart.filter(c=>c.checked);
+            if(items.length === 0) return showToast("No items to checkout", "error");
+
+            const sub = items.reduce((s,i)=>s+(i.price*i.qty),0), dc = window.adminSettings.deliveryCharge || 120;
+            
+            const btn = e.target; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...'; btn.disabled = true;
+            try {
+                await addDoc(collection(db, "orders"), { 
+                    userId: currentUser.uid, 
+                    customerInfo: { name:n, phone:p, address:fullAddress }, 
+                    items, subtotal:sub, deliveryCharge:dc, grandTotal:sub+dc, 
+                    paymentType: "Advance Delivery Charge", 
+                    trxId: trx, 
+                    status: "Pending", 
+                    createdAt: serverTimestamp() 
+                });
+                
+                if(!window.directBuyItem) {
+                    window.cart = window.cart.filter(c=>!c.checked); 
+                    localStorage.setItem('cart', JSON.stringify(window.cart)); 
+                    updateCartCount();
+                }
+                
+                window.directBuyItem = null; 
+                showToast("Order Confirmed Successfully!"); switchTab('orders');
+            } catch(err) { showToast("Error placing order", "error"); }
+            btn.innerHTML = 'Confirm Order'; btn.disabled = false;
+        }
+
+        // ================= ORDER HISTORY =================
+        window.fetchMyOrders = () => {
+            if(!currentUser) return;
+            const container = document.getElementById('ordersListContainer');
+            
+            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
+            onSnapshot(q, snap => {
+                if(snap.empty) { container.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold"><i class="fa-solid fa-box-open text-6xl mb-4 opacity-50"></i><br>No orders placed yet.</div>'; return; }
+                let html = '';
+                snap.forEach(d => {
+                    const o = d.data();
+                    const statusColor = o.status==='Pending'?'bg-amber-100 text-amber-700':(o.status==='Delivered'?'bg-emerald-100 text-emerald-700':(o.status==='Shipping'?'bg-indigo-100 text-indigo-700':'bg-blue-100 text-blue-700'));
+                    let itemsHtml = o.items.map(i => `<div class="flex justify-between items-center text-sm text-slate-600 dark:text-slate-400 mb-2 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-100 dark:border-slate-700/50"><div class="flex items-center gap-2"><img src="${i.image}" class="w-8 h-8 rounded object-cover"> <span>${i.qty}x ${i.name}</span></div><span class="font-bold text-slate-800 dark:text-white">৳${i.price*i.qty}</span></div>`).join('');
+                    html += `
+                        <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-5 rounded-3xl shadow-sm mb-4">
+                            <div class="flex justify-between items-center mb-4 border-b dark:border-slate-700 pb-3">
+                                <div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Order #${d.id.substring(0,8)}</p><p class="text-xs font-bold text-slate-500">${o.createdAt ? new Date(o.createdAt.toDate()).toLocaleDateString() : 'Just now'}</p></div>
+                                <span class="px-3 py-1 rounded-full text-[10px] uppercase tracking-wide font-black shadow-sm ${statusColor}">${o.status}</span>
+                            </div>
+                            <div class="mb-4">${itemsHtml}</div>
+                            <div class="flex justify-between items-center pt-3 border-t dark:border-slate-700">
+                                <span class="text-sm font-bold text-slate-500">Total Amount:</span>
+                                <span class="font-black text-indigo-600 text-lg">৳${o.grandTotal}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            });
+        };
+    </script>
+<script>
+(function () {
+    const ua = navigator.userAgent;
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(ua);
+    if (!isMobile) {
+        document.open();
+        throw new Error("Desktop access blocked.");
+    }
+})();
+</script>
+</body>
+</html>
