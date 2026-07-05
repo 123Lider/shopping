@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>shopping area bd)</title>
+    <title>shopping area bd</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -26,7 +26,7 @@
         .snap-x-mandatory { scroll-snap-type: x mandatory; }
         .snap-center { scroll-snap-align: center; }
         
-        /* View Transitions (Fixed flex conflict) */
+        /* View Transitions */
         .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -37,16 +37,16 @@
         @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 pb-16 md:pb-0">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 pb-16 md:pb-0 overflow-x-hidden">
 
     <!-- Navbar (Top) -->
-    <nav class="bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-40">
+    <nav class="bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-40 transition-colors duration-300">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-2xl font-black text-indigo-600 cursor-pointer flex items-center gap-2" onclick="switchTab('home')">
                 <i class="fa-solid fa-bolt text-yellow-500"></i> SHOPPIN AREA
             </h1>
             
-            <!-- Desktop Search with Dropdown -->
+            <!-- Desktop Search -->
             <div class="hidden md:flex w-1/2 relative">
                 <input type="text" id="desktopSearch" placeholder="Search products, brands..." class="w-full pl-5 pr-10 py-2.5 border border-slate-200 rounded-l-xl dark:bg-slate-700 dark:border-slate-600 focus:outline-none focus:border-indigo-500 text-sm" autocomplete="off">
                 <button onclick="document.getElementById('imageSearchInput').click()" class="px-4 bg-slate-100 dark:bg-slate-700 border-t border-b border-slate-200 dark:border-slate-600 text-slate-500 hover:text-indigo-600 transition"><i class="fa-solid fa-camera"></i></button>
@@ -56,7 +56,7 @@
             </div>
 
             <div class="flex space-x-5 items-center">
-                <button id="themeToggle" class="text-xl text-slate-500 hover:text-indigo-600"><i class="fa-solid fa-moon"></i></button>
+                <button id="themeToggle" class="text-xl text-slate-500 hover:text-indigo-600 transition-colors"><i class="fa-solid fa-moon"></i></button>
                 <div class="hidden md:flex space-x-4">
                     <button class="text-xl relative text-slate-500 hover:text-indigo-600" onclick="switchTab('cart')">
                         <i class="fa-solid fa-cart-shopping"></i>
@@ -85,8 +85,12 @@
         
         <!-- ================= 1. HOME VIEW ================= -->
         <section id="view-home" class="view-section active px-4 py-4 md:py-6">
-            <div id="bannerSlider" class="flex overflow-x-auto hide-scroll snap-x-mandatory gap-4 mb-8 rounded-2xl">
-                <div class="w-full h-40 md:h-64 rounded-2xl snap-center flex-shrink-0 skeleton"></div>
+            
+            <div class="relative mb-8 group">
+                <div id="bannerSlider" class="flex overflow-x-auto hide-scroll snap-x-mandatory gap-4 rounded-2xl scroll-smooth">
+                    <div class="w-full h-44 md:h-72 rounded-2xl snap-center flex-shrink-0 skeleton"></div>
+                </div>
+                <div id="bannerDots" class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none"></div>
             </div>
 
             <h3 class="font-extrabold text-lg mb-4 text-slate-800 dark:text-white">Shop by Category</h3>
@@ -156,61 +160,59 @@
         <section id="view-checkout" class="view-section px-4 py-6 md:py-8 max-w-2xl mx-auto">
             <h2 class="text-3xl font-black mb-8 flex items-center gap-3"><button onclick="switchTab('cart')" class="text-slate-400 hover:text-indigo-600 text-2xl"><i class="fa-solid fa-arrow-left"></i></button> Secure Checkout</h2>
             <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 mb-6">
+                
+                <!-- Updated Delivery Info Layout -->
                 <h3 class="font-black text-lg mb-5 text-slate-800 dark:text-white border-b dark:border-slate-700 pb-2">Delivery Information</h3>
                 <input type="text" id="chkName" placeholder="Full Name" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
                 <input type="tel" id="chkPhone" placeholder="Phone Number" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
-                <textarea id="chkAddress" placeholder="Full Delivery Address" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" rows="3" required></textarea>
                 
-                <h3 class="font-black text-lg mt-6 mb-3 text-slate-800 dark:text-white border-b dark:border-slate-700 pb-2">Payment Method</h3>
-                <p class="text-sm text-slate-500 mb-4 font-medium">Please send your payment to <strong id="adminBkash" class="text-pink-600 bg-pink-50 px-2 py-0.5 rounded">Loading...</strong> via bKash/Nagad.</p>
-                <select id="chkPayment" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none font-bold focus:border-indigo-500 text-sm">
-                    <option value="cod">Cash On Delivery (Pay Delivery Only)</option>
-                    <option value="advance50">50% Advance Payment</option>
-                    <option value="advance100">100% Full Payment</option>
-                </select>
-                <input type="text" id="chkTrx" placeholder="Enter bKash/Nagad TrxID" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium font-mono">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <select id="chkDivision" class="w-full p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-slate-600 dark:text-slate-300" required>
+                        <option value="" disabled selected>Select Division</option>
+                        <option value="Dhaka">Dhaka</option>
+                        <option value="Chattogram">Chattogram</option>
+                        <option value="Rajshahi">Rajshahi</option>
+                        <option value="Khulna">Khulna</option>
+                        <option value="Barishal">Barishal</option>
+                        <option value="Sylhet">Sylhet</option>
+                        <option value="Rangpur">Rangpur</option>
+                        <option value="Mymensingh">Mymensingh</option>
+                    </select>
+                    <input type="text" id="chkDistrict" placeholder="District" class="w-full p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
+                    <input type="text" id="chkThana" placeholder="Thana / Upazila" class="w-full p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
+                    <input type="text" id="chkArea" placeholder="Union / Area" class="w-full p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" required>
+                </div>
+                
+                <textarea id="chkAddressDetails" placeholder="Detailed Address (House, Road, Village)" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium" rows="2" required></textarea>
+                
+                <!-- Updated Payment Details -->
+                <h3 class="font-black text-lg mt-6 mb-3 text-slate-800 dark:text-white border-b dark:border-slate-700 pb-2">Advance Delivery Charge</h3>
+                <p class="text-sm text-slate-500 mb-4 font-medium leading-relaxed">
+                    To confirm your order, please pay the delivery charge (<span id="checkoutDcAmount" class="font-bold text-indigo-600">৳0</span>) to <strong id="adminBkash" class="text-pink-600 bg-pink-50 px-2 py-0.5 rounded">Loading...</strong> via bKash/Nagad. The rest amount will be collected on delivery (Cash on Delivery).
+                </p>
+                
+                <input type="text" id="chkTrx" placeholder="Enter bKash/Nagad TrxID" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-bold font-mono tracking-wide" required>
                 
                 <button onclick="placeOrder(event)" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-lg hover:bg-emerald-600 mt-6 shadow-lg hover:shadow-emerald-500/30 transition">Confirm Order</button>
             </div>
         </section>
 
-        <!-- ================= 5. LIVE CHAT VIEW ================= -->
-        <section id="view-chat" class="view-section px-4 py-4 md:py-6 max-w-3xl mx-auto h-[80vh]">
-            <!-- Added wrapper to fix flex issue -->
-            <div class="flex flex-col h-full bg-slate-50 dark:bg-slate-800/50 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700/50 shadow-sm relative">
-                <div class="bg-white dark:bg-slate-800 p-4 flex items-center gap-3 z-10 border-b border-slate-200 dark:border-slate-700/50">
-                    <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 rounded-full flex items-center justify-center font-bold shadow-sm"><i class="fa-solid fa-headset"></i></div>
-                    <div>
-                        <h2 class="font-black text-slate-800 dark:text-white leading-tight">Customer Support</h2>
-                        <p class="text-xs text-emerald-500 font-bold">Online</p>
-                    </div>
-                </div>
-                
-                <div id="chatMessages" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-4">
-                    <div class="text-center text-slate-400 text-sm py-10 font-medium">Send a message to start chatting!</div>
-                </div>
-                
-                <div class="bg-white dark:bg-slate-800 p-3 z-10 border-t border-slate-200 dark:border-slate-700/50">
-                    <form id="chatForm" class="flex gap-2 relative">
-                        <input type="text" id="chatInput" placeholder="Type a message..." class="flex-1 p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium pr-12" required autocomplete="off">
-                        <button type="submit" class="absolute right-1.5 top-1.5 bg-indigo-600 text-white w-11 h-11 rounded-lg flex items-center justify-center hover:bg-indigo-700 transition"><i class="fa-solid fa-paper-plane text-sm"></i></button>
-                    </form>
-                </div>
+        <!-- ================= 5. ME / PROFILE / ORDERS VIEW ================= -->
+        <section id="view-me" class="view-section px-4 py-6 md:py-8 max-w-3xl mx-auto relative">
+            
+            <div class="flex justify-between items-center mb-6 px-1">
+                <h2 class="text-2xl font-black text-slate-800 dark:text-white">My Profile</h2>
+                <!-- Hamburger Menu Button -->
+                <button id="meMenuBtn" onclick="openSettingsMenu()" class="text-2xl text-slate-500 hover:text-indigo-600 transition hidden"><i class="fa-solid fa-bars"></i></button>
             </div>
-        </section>
 
-        <!-- ================= 6. ME / PROFILE / ORDERS VIEW ================= -->
-        <section id="view-me" class="view-section px-4 py-6 md:py-8 max-w-3xl mx-auto">
-            <!-- Profile Header -->
             <div id="profileContainer" class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 text-center mb-6 relative overflow-hidden">
                 <!-- Injected via Auth -->
             </div>
 
-            <!-- Logged In Features (Order Status & Menus) -->
             <div id="meFeatures" class="hidden">
                 <h3 class="font-black text-lg mb-4 text-slate-800 dark:text-white">My Order Status</h3>
                 
-                <!-- Quick Status Tracker -->
                 <div class="grid grid-cols-4 gap-3 mb-6 bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50">
                     <div class="flex flex-col items-center cursor-pointer hover:scale-105 transition" onclick="switchTab('orders')">
                         <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-lg mb-2 relative">
@@ -240,25 +242,6 @@
                         <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Delivered</span>
                     </div>
                 </div>
-
-                <!-- Settings & Menu -->
-                <div class="space-y-3">
-                    <button onclick="switchTab('orders')" class="w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 p-4 rounded-2xl flex justify-between items-center transition border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                        <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3"><i class="fa-solid fa-list-check w-6 text-indigo-500"></i> All Order History</span> 
-                        <i class="fa-solid fa-chevron-right text-sm text-slate-400"></i>
-                    </button>
-                    <button onclick="openChangePasswordModal()" class="w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 p-4 rounded-2xl flex justify-between items-center transition border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                        <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3"><i class="fa-solid fa-key w-6 text-amber-500"></i> Change Password</span> 
-                        <i class="fa-solid fa-chevron-right text-sm text-slate-400"></i>
-                    </button>
-                    <button onclick="requireAuth(() => switchTab('chat'))" class="w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 p-4 rounded-2xl flex justify-between items-center transition border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                        <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3"><i class="fa-solid fa-headset w-6 text-emerald-500"></i> Help & Support</span> 
-                        <i class="fa-solid fa-chevron-right text-sm text-slate-400"></i>
-                    </button>
-                    <button onclick="logout()" class="w-full bg-red-50 dark:bg-red-900/20 text-red-600 p-4 rounded-2xl font-black mt-6 border border-red-100 dark:border-red-900/50 hover:bg-red-100 transition shadow-sm">
-                        Log Out Safely
-                    </button>
-                </div>
             </div>
         </section>
 
@@ -276,7 +259,7 @@
     </main>
 
     <!-- Bottom Navigation (Mobile Only) -->
-    <nav class="md:hidden fixed bottom-0 w-full bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 flex justify-around items-center h-16 z-40 pb-safe shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+    <nav class="md:hidden fixed bottom-0 w-full bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 flex justify-around items-center h-16 z-40 pb-safe shadow-[0_-5px_15px_rgba(0,0,0,0.05)] transition-colors duration-300">
         <button onclick="switchTab('home')" class="nav-btn flex flex-col items-center w-1/4 text-indigo-600 transition-colors" data-tab="home">
             <i class="fa-solid fa-house text-xl mb-1 transition-transform"></i>
             <span class="text-[10px] font-bold">Home</span>
@@ -288,8 +271,8 @@
             </div>
             <span class="text-[10px] font-bold">Cart</span>
         </button>
-        <button onclick="requireAuth(() => switchTab('chat'))" class="nav-btn flex flex-col items-center w-1/4 text-slate-400 hover:text-indigo-500 transition-colors relative" data-tab="chat">
-            <i class="fa-solid fa-comment-dots text-xl mb-1 transition-transform"></i>
+        <button onclick="openWhatsApp()" class="nav-btn flex flex-col items-center w-1/4 text-slate-400 hover:text-indigo-500 transition-colors relative" data-tab="chat">
+            <i class="fa-brands fa-whatsapp text-xl mb-1 transition-transform"></i>
             <span class="text-[10px] font-bold">Chat</span>
         </button>
         <button onclick="switchTab('me')" class="nav-btn flex flex-col items-center w-1/4 text-slate-400 hover:text-indigo-500 transition-colors" data-tab="me">
@@ -298,9 +281,36 @@
         </button>
     </nav>
 
+    <!-- Settings Menu Drawer (Hamburger Menu Content) -->
+    <div id="settingsMenuOverlay" class="fixed inset-0 bg-slate-900/60 z-[60] hidden backdrop-blur-sm transition-opacity opacity-0" onclick="closeSettingsMenu()"></div>
+    <div id="settingsMenu" class="fixed top-0 right-0 h-full w-3/4 max-w-sm bg-white dark:bg-slate-800 z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <div class="p-6 border-b dark:border-slate-100 dark:border-slate-700/50 flex justify-between items-center">
+            <h3 class="font-black text-xl text-slate-800 dark:text-white">Settings</h3>
+            <button onclick="closeSettingsMenu()" class="text-slate-400 hover:text-red-500 text-2xl transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="p-6 space-y-4 flex-1 overflow-y-auto">
+            <button onclick="closeSettingsAndSwitch('orders')" class="w-full bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 p-4 rounded-2xl flex justify-between items-center transition border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3"><i class="fa-solid fa-list-check w-6 text-indigo-500"></i> Order History</span> 
+                <i class="fa-solid fa-chevron-right text-sm text-slate-400"></i>
+            </button>
+            <button onclick="closeSettingsMenu(); openChangePasswordModal()" class="w-full bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 p-4 rounded-2xl flex justify-between items-center transition border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3"><i class="fa-solid fa-key w-6 text-amber-500"></i> Change Password</span> 
+                <i class="fa-solid fa-chevron-right text-sm text-slate-400"></i>
+            </button>
+            <button onclick="closeSettingsMenu(); openWhatsApp()" class="w-full bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 p-4 rounded-2xl flex justify-between items-center transition border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3"><i class="fa-brands fa-whatsapp w-6 text-emerald-500"></i> Help & Support</span> 
+                <i class="fa-solid fa-chevron-right text-sm text-slate-400"></i>
+            </button>
+        </div>
+        <div class="p-6 border-t dark:border-slate-100 dark:border-slate-700/50">
+            <button onclick="closeSettingsMenu(); logout()" class="w-full bg-red-50 dark:bg-red-900/20 text-red-600 p-4 rounded-2xl font-black border border-red-100 dark:border-red-900/50 hover:bg-red-100 transition shadow-sm flex justify-center items-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Log Out Safely
+            </button>
+        </div>
+    </div>
+
     <!-- Modals -->
-    <!-- 1. Auth Modal -->
-    <div id="authModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center px-4 backdrop-blur-sm">
+    <div id="authModal" class="fixed inset-0 bg-slate-900/60 z-[80] hidden flex items-center justify-center px-4 backdrop-blur-sm">
         <div class="bg-white dark:bg-slate-800 w-full max-w-sm p-8 rounded-3xl shadow-2xl relative transition-all transform scale-95 opacity-0 duration-300" id="authModalContent">
             <button onclick="closeLoginModal()" class="absolute top-5 right-5 text-slate-400 hover:text-red-500 bg-slate-100 dark:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
             
@@ -326,17 +336,14 @@
         </div>
     </div>
 
-    <!-- 2. Change Password Modal -->
-    <div id="passwordModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center px-4 backdrop-blur-sm">
+    <!-- Password Modal -->
+    <div id="passwordModal" class="fixed inset-0 bg-slate-900/60 z-[80] hidden flex items-center justify-center px-4 backdrop-blur-sm">
         <div class="bg-white dark:bg-slate-800 w-full max-w-sm p-8 rounded-3xl shadow-2xl relative transition-all transform scale-95 opacity-0 duration-300" id="passwordModalContent">
             <button onclick="closeChangePasswordModal()" class="absolute top-5 right-5 text-slate-400 hover:text-red-500 bg-slate-100 dark:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
-            
             <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-key"></i></div>
             <h2 class="text-2xl font-black mb-6 text-center text-slate-800 dark:text-white">Change Password</h2>
-            
             <input type="password" id="pwdOld" placeholder="Current Password" class="w-full mb-4 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-sm">
             <input type="password" id="pwdNew" placeholder="New Password" class="w-full mb-6 p-3.5 border border-slate-200 rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:border-indigo-500 font-medium text-sm">
-            
             <button onclick="updateUserPassword()" id="pwdBtn" class="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30">Update Password</button>
         </div>
     </div>
@@ -346,7 +353,7 @@
         <i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="toastMsg">Message</span>
     </div>
 
-    <!-- Loading Overlay for Image Search -->
+    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center text-white">
         <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
         <h3 class="text-xl font-bold animate-pulse">Analyzing Image...</h3>
@@ -371,13 +378,40 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const WHATSAPP_NUMBER = "8801347062830";
 
-        // State
+        // State Variables
         window.allProducts = [];
         window.cart = JSON.parse(localStorage.getItem('cart') || '[]');
         window.currentUser = null;
         window.adminSettings = { bkash: "01XXXXXXXXX", deliveryCharge: 120 };
-        let chatUnsubscribe = null;
+        window.directBuyItem = null;
+
+        // ================= THEME TOGGLE =================
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+            htmlElement.classList.remove('light');
+            themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        } else {
+            themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+            } else {
+                htmlElement.classList.add('dark');
+                htmlElement.classList.remove('light');
+                localStorage.setItem('theme', 'dark');
+                themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            }
+        });
 
         // UI Helpers
         window.showToast = (msg, type='info') => {
@@ -387,7 +421,11 @@
             setTimeout(() => toast.classList.add('translate-x-full'), 3000);
         }
 
+        window.openWhatsApp = () => window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
+
         window.switchTab = (tabId) => {
+            if(tabId !== 'checkout') window.directBuyItem = null; 
+
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${tabId}`).classList.add('active');
             
@@ -406,138 +444,109 @@
             
             if(tabId === 'cart') renderCart();
             if(tabId === 'me' && !currentUser) openLoginModal();
-            if(tabId === 'chat') {
-                if(!currentUser) openLoginModal();
-                else loadChatHistory();
-            }
             if(tabId === 'orders') fetchMyOrders();
         }
 
-        // ================= AUTHENTICATION & PROFILE =================
-        window.openLoginModal = () => {
-            const m = document.getElementById('authModal'), c = document.getElementById('authModalContent');
-            m.classList.remove('hidden');
-            setTimeout(() => c.classList.remove('scale-95', 'opacity-0'), 10);
-        }
-        window.closeLoginModal = () => {
-            const c = document.getElementById('authModalContent');
-            c.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300);
-        }
-        window.toggleAuth = (t) => {
-            document.getElementById('loginFormBlock').style.display = t === 'login' ? 'block' : 'none';
-            document.getElementById('registerFormBlock').style.display = t === 'register' ? 'block' : 'none';
-        }
-        window.requireAuth = (cb) => {
-            if(currentUser) cb(); 
-            else { showToast("Login Required!"); openLoginModal(); }
-        }
+        // ================= SETTINGS MENU (Hamburger) =================
+        window.openSettingsMenu = () => {
+            const over = document.getElementById('settingsMenuOverlay'), menu = document.getElementById('settingsMenu');
+            over.classList.remove('hidden');
+            setTimeout(() => over.classList.remove('opacity-0'), 10);
+            menu.classList.remove('translate-x-full');
+        };
+        window.closeSettingsMenu = () => {
+            const over = document.getElementById('settingsMenuOverlay'), menu = document.getElementById('settingsMenu');
+            over.classList.add('opacity-0');
+            menu.classList.add('translate-x-full');
+            setTimeout(() => over.classList.add('hidden'), 300);
+        };
+        window.closeSettingsAndSwitch = (tab) => {
+            closeSettingsMenu();
+            switchTab(tab);
+        };
+
+        // Auth Methods
+        window.openLoginModal = () => { document.getElementById('authModal').classList.remove('hidden'); setTimeout(() => document.getElementById('authModalContent').classList.remove('scale-95', 'opacity-0'), 10); }
+        window.closeLoginModal = () => { document.getElementById('authModalContent').classList.add('scale-95', 'opacity-0'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }
+        window.toggleAuth = (t) => { document.getElementById('loginFormBlock').style.display = t === 'login' ? 'block' : 'none'; document.getElementById('registerFormBlock').style.display = t === 'register' ? 'block' : 'none'; }
+        window.requireAuth = (cb) => { if(currentUser) cb(); else { showToast("Login Required!"); openLoginModal(); } }
 
         window.handleLogin = async () => {
             const e = document.getElementById('logEmail').value, p = document.getElementById('logPass').value;
             const b = document.getElementById('logBtn'); b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-            try { await signInWithEmailAndPassword(auth, e, p); closeLoginModal(); showToast("Logged In!"); } 
-            catch(err) { showToast(err.message, 'error'); }
+            try { await signInWithEmailAndPassword(auth, e, p); closeLoginModal(); showToast("Logged In!"); } catch(err) { showToast(err.message, 'error'); }
             b.innerHTML = 'Secure Login';
         }
-
         window.handleRegister = async () => {
             const n = document.getElementById('regName').value, e = document.getElementById('regEmail').value, p = document.getElementById('regPass').value;
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, e, p);
-                await updateProfile(cred.user, { displayName: n });
-                closeLoginModal(); showToast("Account Created!");
-            } catch(err) { showToast(err.message, 'error'); }
+            try { const cred = await createUserWithEmailAndPassword(auth, e, p); await updateProfile(cred.user, { displayName: n }); closeLoginModal(); showToast("Account Created!"); } catch(err) { showToast(err.message, 'error'); }
         }
-
         window.logout = async () => { await signOut(auth); switchTab('home'); showToast("Logged Out"); }
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            const proContainer = document.getElementById('profileContainer');
-            const meFeat = document.getElementById('meFeatures');
-            
             if(user) {
-                document.getElementById('navLoginBtn').innerText = 'Profile';
-                document.getElementById('navLoginBtn').onclick = () => switchTab('me');
+                document.getElementById('navLoginBtn').innerText = 'Profile'; document.getElementById('navLoginBtn').onclick = () => switchTab('me');
+                document.getElementById('profileContainer').innerHTML = `<div class="w-24 h-24 bg-white dark:bg-slate-800 text-indigo-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border-4 border-slate-50 dark:border-slate-700 relative z-10"><i class="fa-solid fa-user"></i></div><h2 class="text-2xl font-black text-slate-800 dark:text-white relative z-10">${user.displayName || 'Customer'}</h2><p class="text-slate-500 text-sm font-medium relative z-10">${user.email}</p>`;
                 
-                proContainer.innerHTML = `
-                    <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-20"></div>
-                    <div class="w-24 h-24 bg-white dark:bg-slate-800 text-indigo-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 shadow-md border-4 border-slate-50 dark:border-slate-700 relative z-10"><i class="fa-solid fa-user"></i></div>
-                    <h2 class="text-2xl font-black text-slate-800 dark:text-white relative z-10">${user.displayName || 'Customer'}</h2>
-                    <p class="text-slate-500 text-sm font-medium relative z-10">${user.email}</p>
-                `;
-                meFeat.classList.remove('hidden');
+                document.getElementById('meMenuBtn').classList.remove('hidden');
+                document.getElementById('meFeatures').classList.remove('hidden');
                 
-                // Fetch User Orders for Status Tracker
                 onSnapshot(query(collection(db, "orders"), where("userId", "==", user.uid)), snap => {
-                    let p=0, sh=0;
-                    snap.forEach(d => {
-                        const st = d.data().status;
-                        if(st === 'Pending' || st === 'Confirmed') p++;
-                        if(st === 'Shipping') sh++;
-                    });
-                    const bp = document.getElementById('badgePending');
-                    const bs = document.getElementById('badgeShipping');
+                    let p=0, sh=0; snap.forEach(d => { const st = d.data().status; if(st === 'Pending' || st === 'Confirmed') p++; if(st === 'Shipping') sh++; });
+                    const bp = document.getElementById('badgePending'); const bs = document.getElementById('badgeShipping');
                     if(p > 0) { bp.innerText = p; bp.classList.remove('hidden'); } else bp.classList.add('hidden');
                     if(sh > 0) { bs.innerText = sh; bs.classList.remove('hidden'); } else bs.classList.add('hidden');
                 });
-                
             } else {
-                document.getElementById('navLoginBtn').innerText = 'Login';
-                document.getElementById('navLoginBtn').onclick = openLoginModal;
-                proContainer.innerHTML = `<i class="fa-solid fa-user-shield text-6xl text-slate-300 mb-4"></i><h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Guest User</h2><p class="mb-6 text-sm text-slate-500 font-medium">Login to view your profile and orders</p><button onclick="openLoginModal()" class="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-indigo-500/30">Login / Register</button>`;
-                meFeat.classList.add('hidden');
+                document.getElementById('navLoginBtn').innerText = 'Login'; document.getElementById('navLoginBtn').onclick = openLoginModal;
+                document.getElementById('profileContainer').innerHTML = `<i class="fa-solid fa-user-shield text-6xl text-slate-300 mb-4"></i><h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Guest User</h2><p class="mb-6 text-sm text-slate-500 font-medium">Login to view your profile and orders</p><button onclick="openLoginModal()" class="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-indigo-500/30">Login / Register</button>`;
+                
+                document.getElementById('meMenuBtn').classList.add('hidden');
+                document.getElementById('meFeatures').classList.add('hidden');
             }
         });
 
         // ================= PASSWORD CHANGE =================
-        window.openChangePasswordModal = () => {
-            document.getElementById('pwdOld').value = '';
-            document.getElementById('pwdNew').value = '';
-            const m = document.getElementById('passwordModal'), c = document.getElementById('passwordModalContent');
-            m.classList.remove('hidden');
-            setTimeout(() => c.classList.remove('scale-95', 'opacity-0'), 10);
-        };
-        window.closeChangePasswordModal = () => {
-            const c = document.getElementById('passwordModalContent');
-            c.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => document.getElementById('passwordModal').classList.add('hidden'), 300);
-        };
-
+        window.openChangePasswordModal = () => { document.getElementById('pwdOld').value = ''; document.getElementById('pwdNew').value = ''; document.getElementById('passwordModal').classList.remove('hidden'); setTimeout(() => document.getElementById('passwordModalContent').classList.remove('scale-95', 'opacity-0'), 10); };
+        window.closeChangePasswordModal = () => { document.getElementById('passwordModalContent').classList.add('scale-95', 'opacity-0'); setTimeout(() => document.getElementById('passwordModal').classList.add('hidden'), 300); };
         window.updateUserPassword = async () => {
             if(!currentUser) return;
-            const oldP = document.getElementById('pwdOld').value;
-            const newP = document.getElementById('pwdNew').value;
+            const oldP = document.getElementById('pwdOld').value, newP = document.getElementById('pwdNew').value;
             if(!oldP || !newP) return showToast('Please fill both fields', 'error');
-            
-            const btn = document.getElementById('pwdBtn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
-            
-            try {
-                const credential = EmailAuthProvider.credential(currentUser.email, oldP);
-                await reauthenticateWithCredential(currentUser, credential);
-                await updatePassword(currentUser, newP);
-                closeChangePasswordModal();
-                showToast('Password Updated Successfully!');
-            } catch(e) {
-                showToast(e.message, 'error');
-            }
+            const btn = document.getElementById('pwdBtn'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
+            try { await reauthenticateWithCredential(currentUser, EmailAuthProvider.credential(currentUser.email, oldP)); await updatePassword(currentUser, newP); closeChangePasswordModal(); showToast('Password Updated Successfully!'); } catch(e) { showToast(e.message, 'error'); }
             btn.innerHTML = 'Update Password';
         };
 
-        // ================= FETCHING DATA =================
+        // ================= DATA FETCH =================
         getDoc(doc(db, "settings", "admin")).then(d => { if(d.exists()){ window.adminSettings = d.data(); document.getElementById('adminBkash').innerText = window.adminSettings.bkash || "01XXXXXXXXX"; }});
 
         onSnapshot(query(collection(db, "banners"), where("active", "==", true)), snap => {
-            const s = document.getElementById('bannerSlider');
-            s.innerHTML = snap.docs.map(doc => `<img src="${doc.data().image}" onclick="window.open('${doc.data().link||'#'}', '_blank')" class="w-full h-40 md:h-72 object-cover rounded-2xl snap-center flex-shrink-0 cursor-pointer shadow-sm">`).join('');
-            if(s.innerHTML==='') s.innerHTML = '<div class="w-full h-40 bg-indigo-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center font-bold text-indigo-400">Welcome to eShop</div>';
+            const s = document.getElementById('bannerSlider'), dots = document.getElementById('bannerDots');
+            if(snap.empty) { s.innerHTML = '<div class="w-full h-44 md:h-72 bg-indigo-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center font-bold text-indigo-400">Welcome to eShop</div>'; dots.innerHTML = ''; return; }
+            s.innerHTML = snap.docs.map(doc => `<img src="${doc.data().image}" onclick="window.open('${doc.data().link||'#'}', '_blank')" class="w-full h-44 md:h-72 object-contain bg-slate-100 dark:bg-slate-900 rounded-2xl snap-center flex-shrink-0 cursor-pointer shadow-sm">`).join('');
+            dots.innerHTML = snap.docs.map((_, i) => `<div class="banner-dot w-2 h-2 rounded-full transition-all duration-300 ${i === 0 ? 'bg-indigo-600 w-5' : 'bg-slate-300 dark:bg-slate-600 opacity-70'}"></div>`).join('');
+            setupBannerSlider(snap.docs.length);
         });
 
+        window.setupBannerSlider = (count) => {
+            const slider = document.getElementById('bannerSlider'); const dots = document.getElementById('bannerDots').children;
+            if(count <= 1) return;
+            let currentIndex = 0;
+            slider.addEventListener('scroll', () => {
+                const index = Math.round(slider.scrollLeft / slider.offsetWidth);
+                if(index >= 0 && index < count && currentIndex !== index) {
+                    currentIndex = index;
+                    for(let i=0; i<dots.length; i++) dots[i].className = i===index ? 'banner-dot w-5 h-2 rounded-full transition-all duration-300 bg-indigo-600 shadow-sm' : 'banner-dot w-2 h-2 rounded-full transition-all duration-300 bg-slate-300 dark:bg-slate-600 opacity-70';
+                }
+            });
+            if(window.bannerInterval) clearInterval(window.bannerInterval);
+            window.bannerInterval = setInterval(() => { currentIndex = (currentIndex + 1) % count; const child = slider.children[currentIndex]; if(child) slider.scrollTo({ left: child.offsetLeft - slider.offsetLeft, behavior: 'smooth' }); }, 3500);
+        };
+
         onSnapshot(query(collection(db, "products"), where("status", "==", "show")), snap => {
-            window.allProducts = [];
-            document.getElementById('productGrid').innerHTML = '';
+            window.allProducts = []; document.getElementById('productGrid').innerHTML = '';
             snap.forEach(doc => { const d = doc.data(); d.id = doc.id; window.allProducts.push(d); renderProductCard(d, 'productGrid'); });
         });
 
@@ -570,66 +579,33 @@
                 if(!term) { drop.classList.add('hidden'); return; }
                 const matches = window.allProducts.filter(p => p.name.toLowerCase().includes(term) || (p.category||'').toLowerCase().includes(term)).slice(0,5);
                 if(matches.length > 0) {
-                    drop.innerHTML = matches.map(m => `
-                        <div onclick="openDetails('${m.id}')" class="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b dark:border-slate-700 last:border-0">
-                            <img src="${m.images[0]}" class="w-10 h-10 rounded-lg object-cover">
-                            <div><p class="font-bold text-sm text-slate-800 dark:text-white">${m.name}</p><p class="text-xs text-indigo-600 font-bold">৳${m.offerPrice || m.price}</p></div>
-                        </div>
-                    `).join('') + `<div onclick="executeSearch('${term}')" class="p-3 text-center text-sm font-bold text-indigo-600 cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20">View all results</div>`;
+                    drop.innerHTML = matches.map(m => `<div onclick="openDetails('${m.id}')" class="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b dark:border-slate-700 last:border-0"><img src="${m.images[0]}" class="w-10 h-10 rounded-lg object-cover"><div><p class="font-bold text-sm text-slate-800 dark:text-white">${m.name}</p><p class="text-xs text-indigo-600 font-bold">৳${m.offerPrice || m.price}</p></div></div>`).join('') + `<div onclick="executeSearch('${term}')" class="p-3 text-center text-sm font-bold text-indigo-600 cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20">View all results</div>`;
                     drop.classList.remove('hidden');
                 } else drop.classList.add('hidden');
             });
             document.addEventListener('click', (e) => { if(!inp.contains(e.target) && !drop.contains(e.target)) drop.classList.add('hidden'); });
         }
-        setupAutocomplete('desktopSearch', 'desktopSearchDropdown');
-        setupAutocomplete('mobileSearch', 'mobileSearchDropdown');
+        setupAutocomplete('desktopSearch', 'desktopSearchDropdown'); setupAutocomplete('mobileSearch', 'mobileSearchDropdown');
 
         window.executeSearch = (term) => {
             if(!term) return;
-            document.getElementById('desktopSearchDropdown').classList.add('hidden');
-            document.getElementById('mobileSearchDropdown').classList.add('hidden');
-            
+            document.getElementById('desktopSearchDropdown').classList.add('hidden'); document.getElementById('mobileSearchDropdown').classList.add('hidden');
             document.getElementById('searchKeyword').innerText = `for "${term}"`;
-            const container = document.getElementById('searchResultsGrid');
-            container.innerHTML = '';
+            const container = document.getElementById('searchResultsGrid'); container.innerHTML = '';
             const res = window.allProducts.filter(p => p.name.toLowerCase().includes(term.toLowerCase()) || (p.category||'').toLowerCase().includes(term.toLowerCase()));
-            
-            if(res.length > 0) res.forEach(p => renderProductCard(p, 'searchResultsGrid'));
-            else container.innerHTML = '<div class="col-span-2 md:col-span-4 py-20 text-center font-bold text-slate-500">No products found. Try a different keyword.</div>';
+            if(res.length > 0) res.forEach(p => renderProductCard(p, 'searchResultsGrid')); else container.innerHTML = '<div class="col-span-2 md:col-span-4 py-20 text-center font-bold text-slate-500">No products found. Try a different keyword.</div>';
             switchTab('search');
         };
 
         window.filterCategory = (cat) => {
             document.getElementById('searchKeyword').innerText = `in ${cat}`;
-            const container = document.getElementById('searchResultsGrid');
-            container.innerHTML = '';
+            const container = document.getElementById('searchResultsGrid'); container.innerHTML = '';
             const res = window.allProducts.filter(p => (p.category||'').toLowerCase() === cat.toLowerCase());
-            if(res.length > 0) res.forEach(p => renderProductCard(p, 'searchResultsGrid'));
-            else container.innerHTML = `<div class="col-span-2 md:col-span-4 py-20 text-center font-bold text-slate-500">No products in ${cat} yet.</div>`;
+            if(res.length > 0) res.forEach(p => renderProductCard(p, 'searchResultsGrid')); else container.innerHTML = `<div class="col-span-2 md:col-span-4 py-20 text-center font-bold text-slate-500">No products in ${cat} yet.</div>`;
             switchTab('search');
         };
 
-        document.getElementById('imageSearchInput').addEventListener('change', (e) => {
-            if(e.target.files.length > 0) {
-                const loader = document.getElementById('loadingOverlay');
-                loader.classList.remove('hidden'); loader.classList.add('flex');
-                
-                setTimeout(() => {
-                    loader.classList.remove('flex'); loader.classList.add('hidden');
-                    document.getElementById('searchKeyword').innerText = `by Image Scan`;
-                    const container = document.getElementById('searchResultsGrid');
-                    container.innerHTML = '';
-                    const mockResults = window.allProducts.slice(0, 3);
-                    if(mockResults.length > 0) mockResults.forEach(p => renderProductCard(p, 'searchResultsGrid'));
-                    else container.innerHTML = '<div class="col-span-2 md:col-span-4 py-20 text-center font-bold text-slate-500">No similar items found in stock.</div>';
-                    
-                    switchTab('search');
-                    e.target.value = '';
-                }, 2500);
-            }
-        });
-
-        // ================= PRODUCT DETAILS & CHAT INTEGRATION =================
+        // ================= PRODUCT DETAILS =================
         window.openDetails = (id) => {
             const product = window.allProducts.find(p => p.id === id);
             if(!product) return;
@@ -660,8 +636,8 @@
                             <button onclick="requireAuth(() => buyNow('${product.id}'))" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 transition" ${product.stock<=0?'disabled':''}>Buy Now</button>
                         </div>
                         
-                        <button onclick="requireAuth(() => askAboutProduct('${product.name}', '${product.images[0]}', ${currentPrice}))" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-600 transition border border-slate-200 dark:border-slate-600">
-                            <i class="fa-solid fa-headset text-indigo-500 text-lg"></i> Ask Admin about this product
+                        <button onclick="askAboutProduct('${product.id}')" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-600 transition border border-slate-200 dark:border-slate-600">
+                            <i class="fa-brands fa-whatsapp text-emerald-500 text-lg"></i> Ask Admin about this product
                         </button>
                     </div>
                 </div>
@@ -670,20 +646,16 @@
             switchTab('details');
         }
 
-        // Send Product Card to Chat
-        window.askAboutProduct = async (name, img, price) => {
-            // HTML formatted so it automatically looks good on Admin app too!
-            const msgHtml = `I have a question about this product:<br><div class="flex items-center gap-3 mt-2 bg-black/5 p-2 rounded-xl border border-black/10 w-fit pr-4"><img src="${img}" class="w-12 h-12 rounded-lg object-cover"><div><p class="text-xs font-bold text-slate-800 dark:text-white">${name}</p><p class="text-xs font-black text-indigo-600 mt-1">৳${price}</p></div></div>`;
-            
-            await ensureChatDoc();
-            await addDoc(collection(db, "support_chats", currentUser.uid, "messages"), { sender: 'user', text: msgHtml, timestamp: serverTimestamp() });
-            await updateDoc(doc(db, "support_chats", currentUser.uid), { lastMessage: `Asked about: ${name}`, lastUpdated: serverTimestamp(), adminUnread: true, userUnread: false });
-            switchTab('chat');
+        window.askAboutProduct = (productId) => {
+            const product = window.allProducts.find(p => p.id === productId);
+            if(!product) return;
+            const message = `${product.name}\n${window.location.origin}${window.location.pathname}?product=${productId}\n\nআমি এই প্রোডাক্ট সম্পর্কে কিছু জানতে চাই`;
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
         }
 
         // ================= CART & CHECKOUT =================
         const updateCartCount = () => {
-            const count = window.cart.reduce((sum, item) => sum + item.qty, 0);
+            const count = window.cart.length; 
             document.getElementById('desktopCartCount').innerText = count;
             document.getElementById('mobileCartCount').innerText = count;
         }
@@ -700,7 +672,21 @@
                 if(!fromDetails) switchTab('cart');
             });
         }
-        window.buyNow = (id) => { addToCart(id, true); switchTab('cart'); }
+
+        const setCheckoutDcAmount = () => {
+            const el = document.getElementById('checkoutDcAmount');
+            if(el) el.innerText = `৳${window.adminSettings.deliveryCharge || 120}`;
+        };
+
+        window.buyNow = (id) => { 
+            const product = window.allProducts.find(p => p.id === id);
+            window.directBuyItem = { 
+                id: product.id, name: product.name, image: product.images[0], 
+                price: product.offerPrice || product.price, qty: 1, checked: true 
+            };
+            setCheckoutDcAmount();
+            switchTab('checkout'); 
+        }
 
         window.renderCart = () => {
             const container = document.getElementById('cartItemsContainer');
@@ -734,88 +720,62 @@
             document.getElementById('cartSubtotal').innerText = `৳${sub}`;
             document.getElementById('cartTotal').innerText = `৳${sub + (checked>0 ? window.adminSettings.deliveryCharge : 0)}`;
         }
+
         window.toggleCartCheck = (i) => { window.cart[i].checked = !window.cart[i].checked; localStorage.setItem('cart', JSON.stringify(window.cart)); renderCart(); }
         window.changeQty = (i, d) => { window.cart[i].qty += d; if(window.cart[i].qty<=0) window.cart[i].qty=1; localStorage.setItem('cart', JSON.stringify(window.cart)); updateCartCount(); renderCart(); }
         window.removeCart = (i) => { window.cart.splice(i, 1); localStorage.setItem('cart', JSON.stringify(window.cart)); updateCartCount(); renderCart(); }
 
-        window.proceedToCheckout = () => { if(window.cart.some(c=>c.checked)) requireAuth(()=>switchTab('checkout')); else showToast("Select items to checkout", "error"); }
+        window.proceedToCheckout = () => { 
+            window.directBuyItem = null; 
+            if(window.cart.some(c=>c.checked)) {
+                setCheckoutDcAmount();
+                requireAuth(()=>switchTab('checkout')); 
+            }
+            else showToast("Select items to checkout", "error"); 
+        }
 
         window.placeOrder = async (e) => {
-            const n = document.getElementById('chkName').value, p = document.getElementById('chkPhone').value, a = document.getElementById('chkAddress').value;
-            const pay = document.getElementById('chkPayment').value, trx = document.getElementById('chkTrx').value;
-            if(!n || !p || !a) return showToast("Fill all delivery details", "error");
-            if(pay !== 'cod' && !trx) return showToast("TrxID required", "error");
+            const n = document.getElementById('chkName').value;
+            const p = document.getElementById('chkPhone').value;
+            const div = document.getElementById('chkDivision').value;
+            const dist = document.getElementById('chkDistrict').value;
+            const tha = document.getElementById('chkThana').value;
+            const area = document.getElementById('chkArea').value;
+            const adrDetails = document.getElementById('chkAddressDetails').value;
+            const trx = document.getElementById('chkTrx').value;
+            
+            if(!n || !p || !div || !dist || !tha || !area || !adrDetails) return showToast("Please fill all delivery details", "error");
+            if(!trx) return showToast("TrxID is required to confirm order", "error");
 
-            const items = window.cart.filter(c=>c.checked);
-            const sub = items.reduce((s,i)=>s+(i.price*i.qty),0), dc = window.adminSettings.deliveryCharge;
+            const fullAddress = `${adrDetails}, ${area}, ${tha}, ${dist}, ${div}`;
+            const items = window.directBuyItem ? [window.directBuyItem] : window.cart.filter(c=>c.checked);
+            if(items.length === 0) return showToast("No items to checkout", "error");
+
+            const sub = items.reduce((s,i)=>s+(i.price*i.qty),0), dc = window.adminSettings.deliveryCharge || 120;
             
             const btn = e.target; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...'; btn.disabled = true;
             try {
-                await addDoc(collection(db, "orders"), { userId: currentUser.uid, customerInfo: {name:n, phone:p, address:a}, items, subtotal:sub, deliveryCharge:dc, grandTotal:sub+dc, paymentType:pay, trxId:trx||"N/A", status:"Pending", createdAt:serverTimestamp() });
-                window.cart = window.cart.filter(c=>!c.checked); localStorage.setItem('cart', JSON.stringify(window.cart)); updateCartCount();
-                showToast("Order Confirmed!"); switchTab('orders');
+                await addDoc(collection(db, "orders"), { 
+                    userId: currentUser.uid, 
+                    customerInfo: { name:n, phone:p, address:fullAddress }, 
+                    items, subtotal:sub, deliveryCharge:dc, grandTotal:sub+dc, 
+                    paymentType: "Advance Delivery Charge", 
+                    trxId: trx, 
+                    status: "Pending", 
+                    createdAt: serverTimestamp() 
+                });
+                
+                if(!window.directBuyItem) {
+                    window.cart = window.cart.filter(c=>!c.checked); 
+                    localStorage.setItem('cart', JSON.stringify(window.cart)); 
+                    updateCartCount();
+                }
+                
+                window.directBuyItem = null; 
+                showToast("Order Confirmed Successfully!"); switchTab('orders');
             } catch(err) { showToast("Error placing order", "error"); }
             btn.innerHTML = 'Confirm Order'; btn.disabled = false;
         }
-
-        // ================= SUPPORT CHAT =================
-        const ensureChatDoc = async () => {
-            const ref = doc(db, "support_chats", currentUser.uid);
-            const snap = await getDoc(ref);
-            if(!snap.exists()) {
-                await setDoc(ref, {
-                    userId: currentUser.uid,
-                    userName: currentUser.displayName || 'Customer',
-                    userPhone: document.getElementById('chkPhone')?.value || '',
-                    lastMessage: 'Chat Started',
-                    adminUnread: true, userUnread: false, lastUpdated: serverTimestamp()
-                });
-            }
-        };
-
-        const loadChatHistory = async () => {
-            if(!currentUser) return;
-            await ensureChatDoc();
-            updateDoc(doc(db, "support_chats", currentUser.uid), { userUnread: false }).catch(()=>{});
-
-            if(chatUnsubscribe) chatUnsubscribe();
-            const msgsRef = query(collection(db, "support_chats", currentUser.uid, "messages"), orderBy("timestamp", "asc"));
-            
-            chatUnsubscribe = onSnapshot(msgsRef, snap => {
-                const area = document.getElementById('chatMessages');
-                area.innerHTML = '';
-                if(snap.empty) { area.innerHTML = '<div class="text-center text-slate-400 text-sm py-10 font-bold">Start a conversation with Admin</div>'; return; }
-                
-                snap.forEach(d => {
-                    const m = d.data();
-                    const isUser = m.sender === 'user';
-                    
-                    // Notice how m.text is rendered dynamically - allows our product HTML hack to work!
-                    area.innerHTML += `
-                        <div class="flex w-full ${isUser ? 'justify-end' : 'justify-start'}">
-                            <div class="max-w-[85%] p-3.5 rounded-2xl text-sm font-medium shadow-sm ${isUser ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-tl-none'}">
-                                ${m.text}
-                            </div>
-                        </div>
-                    `;
-                });
-                setTimeout(() => area.scrollTop = area.scrollHeight, 100);
-            });
-        };
-
-        document.getElementById('chatForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!currentUser) return;
-            const input = document.getElementById('chatInput');
-            const txt = input.value.trim();
-            if(!txt) return;
-            input.value = '';
-            
-            await ensureChatDoc();
-            const ts = serverTimestamp();
-            await addDoc(collection(db, "support_chats", currentUser.uid, "messages"), { sender: 'user', text: txt, timestamp: ts });
-            await updateDoc(doc(db, "support_chats", currentUser.uid), { lastMessage: txt, lastUpdated: ts, adminUnread: true, userUnread: false });
-        });
 
         // ================= ORDER HISTORY =================
         window.fetchMyOrders = () => {
@@ -825,14 +785,11 @@
             const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
             onSnapshot(q, snap => {
                 if(snap.empty) { container.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold"><i class="fa-solid fa-box-open text-6xl mb-4 opacity-50"></i><br>No orders placed yet.</div>'; return; }
-                
                 let html = '';
                 snap.forEach(d => {
                     const o = d.data();
                     const statusColor = o.status==='Pending'?'bg-amber-100 text-amber-700':(o.status==='Delivered'?'bg-emerald-100 text-emerald-700':(o.status==='Shipping'?'bg-indigo-100 text-indigo-700':'bg-blue-100 text-blue-700'));
-                    
                     let itemsHtml = o.items.map(i => `<div class="flex justify-between items-center text-sm text-slate-600 dark:text-slate-400 mb-2 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-100 dark:border-slate-700/50"><div class="flex items-center gap-2"><img src="${i.image}" class="w-8 h-8 rounded object-cover"> <span>${i.qty}x ${i.name}</span></div><span class="font-bold text-slate-800 dark:text-white">৳${i.price*i.qty}</span></div>`).join('');
-                    
                     html += `
                         <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-5 rounded-3xl shadow-sm mb-4">
                             <div class="flex justify-between items-center mb-4 border-b dark:border-slate-700 pb-3">
@@ -850,7 +807,16 @@
                 container.innerHTML = html;
             });
         };
-
     </script>
+<script>
+(function () {
+    const ua = navigator.userAgent;
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(ua);
+    if (!isMobile) {
+        document.open();
+        throw new Error("Desktop access blocked.");
+    }
+})();
+</script>
 </body>
 </html>
