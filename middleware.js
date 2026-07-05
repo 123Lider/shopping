@@ -1,33 +1,32 @@
 import { NextResponse } from 'next/server';
 
 export function middleware(request) {
-    const url = request.nextUrl;
-    const ua = request.headers.get('user-agent') || '';
-    
-    // Strict Mobile Browser Regex Matching
-    const isMobile = /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(ua);
+    try {
+        const ua = request.headers.get('user-agent') || '';
+        
+        // Strict Mobile Browser Matching
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(ua);
 
-    // ১. যদি Desktop/Laptop ইউজার হয়
-    if (!isMobile) {
-        // Server-side থেকে সরাসরি 404 Text Response পাঠানো হচ্ছে। 
-        // HTML বা অন্য কোনো ফাইল ক্লায়েন্ট পর্যন্ত যাবে না।
-        return new NextResponse('404 Not Found', { 
-            status: 404,
-            headers: { 'Content-Type': 'text/plain' }
-        });
+        // যদি Desktop/Laptop ইউজার হয়
+        if (!isMobile) {
+            // Vercel Edge Runtime-এর জন্য সঠিক Response Object
+            return new Response('404 Not Found', { 
+                status: 404,
+                headers: { 'Content-Type': 'text/plain' }
+            });
+        }
+
+        // Mobile ইউজার হলে রিকোয়েস্ট অ্যালাউ করবে
+        return NextResponse.next();
+    } catch (error) {
+        // কোনো কারণে Error হলে যেন সাইট ব্রেক না করে
+        return NextResponse.next();
     }
-
-    // ২. যদি Mobile ইউজার হয় এবং রুট (/) ডোমেইনে হিট করে
-    if (url.pathname === '/') {
-        // রিকোয়েস্টটিকে public/index.html এর দিকে Rewrite করে দেওয়া হলো
-        return NextResponse.rewrite(new URL('/index.html', request.url));
-    }
-
-    // অন্যান্য রিকোয়েস্ট (যেমন: images, css, js যা public ফোল্ডারে আছে) অ্যালাউ করা হলো
-    return NextResponse.next();
 }
 
 export const config = {
-    // প্রজেক্টের সব রিকোয়েস্ট প্রথমে এই মিডলওয়্যার দিয়ে যাবে
-    matcher: '/:path*',
+    // Next.js-এর নিজস্ব সিস্টেম ফাইল (css, js, images) যেন ব্লক না হয়
+    matcher: [
+        '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    ],
 };
